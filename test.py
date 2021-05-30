@@ -1,7 +1,6 @@
 import unittest
 from polynomial import Polynomial
 
-
 class TestPolynomial(unittest.TestCase):
     def test_init_trash(self):
         try:
@@ -94,3 +93,6 @@ class TestPolynomial(unittest.TestCase):
         b = Polynomial(1)
         b.coefs = [0, 1, 2, 3]
         self.assertEqual(a, b)
+
+if __name__ == '__main__':
+    unittest.main()
