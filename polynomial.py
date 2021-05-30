@@ -9,14 +9,17 @@ class Polynomial:
                 if type(coef) not in (int, float):
                     raise ValueError("coefs list should contain only int or float")
             self.coefs = list(coefs)
-            self.max_pow = len(coefs) - 1
         elif type(coefs) is Polynomial:
             self.coefs = coefs.coefs.copy()
-            self.max_pow = coefs.max_pow
         elif type(coefs) in (int, float):
             self.coefs = [coefs]
         else:
             raise TypeError("coefs should be list, tuple, Polynomial or single int, float")
+        self.__check_zero_max_pow()
+
+    def __check_zero_max_pow(self):
+        while self.max_pow > 0 and self.coefs[0] == 0:
+            self.coefs.pop(0)
 
     @staticmethod
     def __coef_to_term(number):
@@ -35,6 +38,9 @@ class Polynomial:
             return f'-'
         else:
             return None
+
+    def __getattribute__(self, attrname):
+        return len(self.coefs) - 1 if attrname == "max_pow" else object.__getattribute__(self, attrname)
 
     def __str__(self):
         pol_as_str = ''
@@ -67,9 +73,12 @@ class Polynomial:
         return f"Polynomial({self.coefs})"
 
     def __setattr__(self, key, value):
-        self.__dict__[key] = value
         if key == "coefs":
-            self.max_pow = len(self.coefs) - 1
+            self.__dict__[key] = list(value)
+            self.max_pow = len(value) - 1
+            self.__check_zero_max_pow()
+        else:
+            self.__dict__[key] = value
 
     def __add__(self, other):
         if type(other) in (int, float):
@@ -90,6 +99,12 @@ class Polynomial:
         else:
             raise TypeError(f"can't add {type(self)} with {type(other)}")
         return Polynomial(coefs)
+
+    def __radd__(self, other):
+        if type(other) in (int, float):
+            return self.__add__(other)
+        else:
+            raise TypeError(f"can't add {type(self)} with {type(other)}")
 
     def __sub__(self, other):
         if type(other) == Polynomial:
@@ -122,6 +137,12 @@ class Polynomial:
             raise TypeError(f"can't multiply {type(self)} with {type(other)}")
         return Polynomial(coefs)
 
+    def __rmul__(self, other):
+        if type(other) in (int, float):
+            return self.__mul__(other)
+        else:
+            raise TypeError(f"can't add {type(self)} with {type(other)}")
+
     def __eq__(self, other):
         if type(other) in (int, float):
             if self.max_pow == 0:
@@ -132,6 +153,3 @@ class Polynomial:
             return self.coefs == other.coefs
         else:
             raise TypeError(f"can't compare {type(self)} with {type(other)}")
-
-    __radd__ = __add__
-    __rmul__ = __mul__ 
